@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://darklineweb.github.io/darkline/sitemap.xml
