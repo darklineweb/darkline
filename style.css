@@ -1,5 +1,5 @@
 /* ===============================
-   Reset some default styles
+   Reset default styles
 ================================= */
 * {
   margin: 0;
@@ -12,7 +12,7 @@
    Body & general background
 ================================= */
 body {
-  background-color: #121212; /* dark theme */
+  background-color: #121212;
   color: #ffffff;
   line-height: 1.6;
   font-size: 16px;
@@ -74,18 +74,20 @@ header p {
   overflow: hidden;
   text-align: center;
   transition: transform 0.2s;
+  position: relative;
 }
 
 .videos .video-card:hover {
   transform: scale(1.05);
 }
 
-.videos .video-card img {
+.videos .video-card video {
   width: 100%;
-  display: block;
+  height: 150px;
+  object-fit: cover;
 }
 
-.videos .video-card p {
+.videos .video-card h3 {
   padding: 10px;
   font-size: 0.9rem;
   color: #ffffff;
@@ -98,10 +100,13 @@ header p {
   background-color: #1a1a1a;
   width: 95%;
   max-width: 900px;
-  margin: 30px auto;
+  margin: 40px auto 30px auto; /* margin-top added to separate from videos */
   padding: 20px;
   border-radius: 10px;
   border: 1px solid #ff3d00;
+  clear: both;
+  z-index: 1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
 .blog-section h2 {
@@ -160,6 +165,27 @@ footer a:hover {
 }
 
 /* ===============================
+   SCROLL FEED (if needed)
+================================= */
+.feed {
+  height: auto; /* no full-screen blocking */
+  overflow-y: visible; /* allow blog below */
+}
+
+.video-item {
+  height: auto;
+  position: relative;
+  margin-bottom: 20px; /* space between videos */
+}
+
+.video-item h2 {
+  position: absolute;
+  bottom: 20px;
+  left: 10px;
+  color: white;
+}
+
+/* ===============================
    RESPONSIVE
 ================================= */
 @media (max-width: 768px) {
@@ -176,28 +202,4 @@ footer a:hover {
   .videos .video-card {
     width: 100%;
   }
-}
-.feed {
-  height: 100vh;
-  overflow-y: scroll;
-  scroll-snap-type: y mandatory;
-}
-
-.video-item {
-  height: 100vh;
-  position: relative;
-  scroll-snap-align: start;
-}
-
-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-h2 {
-  position: absolute;
-  bottom: 20px;
-  left: 10px;
-  color: white;
 }
