@@ -8,7 +8,7 @@ This project helps you build a **viral content brand + website** using GitHub Pa
 
 ## 🌐 Live Demo
 
-👉 https://yourusername.github.io/darkline81_master/
+👉 https://darklineweb.github.io/darkline/
 
 ---
 
