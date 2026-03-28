@@ -67,8 +67,7 @@ Select:
 ### 3️⃣ Access Your Website
 
 ```
-https://yourusername.github.io/repository-name/
-```
+https://darklineweb.github.io/darkline/```
 
 ---
 
