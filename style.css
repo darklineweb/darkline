@@ -1,56 +1,182 @@
-body {
-background: #0a0a0a;
-color: #fff;
-font-family: Arial, sans-serif;
-text-align: center;
-margin: 0;
-}
-
-header {
-padding: 20px;
-background: linear-gradient(90deg, #ff0000, #000);
-}
-
-h1 {
-margin: 0;
-font-size: 2.5rem;
-}
-
-input {
-width: 80%;
-padding: 10px;
-margin: 20px;
-border-radius: 10px;
-border: none;
-}
-
-.videos {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-gap: 20px;
-padding: 20px;
-}
-
-.video-card {
-background: #111;
-padding: 10px;
-border-radius: 15px;
-box-shadow: 0 0 10px rgba(255,0,0,0.3);
-}
-
-video {
-width: 100%;
-border-radius: 10px;
-}
-
-footer {
-padding: 20px;
-}
-body {
+/* ===============================
+   Reset some default styles
+================================= */
+* {
   margin: 0;
-  background: black;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* ===============================
+   Body & general background
+================================= */
+body {
+  background-color: #121212; /* dark theme */
+  color: #ffffff;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* ===============================
+   HEADER
+================================= */
+header {
+  background-color: #1f1f1f;
+  text-align: center;
+  padding: 20px 10px;
+  border-bottom: 2px solid #ff3d00;
+}
+
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 5px;
+}
+
+header p {
+  font-size: 1rem;
+  color: #ff8c42;
+}
+
+/* ===============================
+   SEARCH BAR
+================================= */
+#search {
+  display: block;
+  width: 90%;
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 10px 15px;
+  border-radius: 25px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+}
+
+/* ===============================
+   VIDEO FEED
+================================= */
+.feed, .videos {
+  width: 95%;
+  max-width: 1000px;
+  margin: 20px auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* Example video card styling */
+.videos .video-card {
+  background-color: #1f1f1f;
+  width: 220px;
+  border-radius: 10px;
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.videos .video-card:hover {
+  transform: scale(1.05);
+}
+
+.videos .video-card img {
+  width: 100%;
+  display: block;
+}
+
+.videos .video-card p {
+  padding: 10px;
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+/* ===============================
+   BLOG SECTION
+================================= */
+.blog-section {
+  background-color: #1a1a1a;
+  width: 95%;
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #ff3d00;
+}
+
+.blog-section h2 {
+  text-align: center;
+  color: #ff8c42;
+  margin-bottom: 15px;
+}
+
+.blog-section ul {
+  list-style-type: none;
+}
+
+.blog-section ul li {
+  margin-bottom: 10px;
+}
+
+.blog-section ul li a {
+  color: #ffffff;
+  text-decoration: none;
+  padding: 8px 12px;
+  display: block;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.blog-section ul li a:hover {
+  background-color: #ff3d00;
+  color: #ffffff;
+}
+
+/* ===============================
+   FOOTER
+================================= */
+footer {
+  background-color: #1f1f1f;
+  text-align: center;
+  padding: 20px 10px;
+  border-top: 2px solid #ff3d00;
+  margin-top: 30px;
+}
+
+footer p {
+  margin-bottom: 10px;
+  color: #ff8c42;
+}
+
+footer a {
+  color: #ffffff;
+  text-decoration: none;
+  margin: 0 10px;
+  transition: color 0.2s;
+}
+
+footer a:hover {
+  color: #ff3d00;
+}
+
+/* ===============================
+   RESPONSIVE
+================================= */
+@media (max-width: 768px) {
+  .videos .video-card {
+    width: 45%;
+  }
+
+  #search {
+    width: 95%;
+  }
+}
+
+@media (max-width: 480px) {
+  .videos .video-card {
+    width: 100%;
+  }
+}
 .feed {
   height: 100vh;
   overflow-y: scroll;
