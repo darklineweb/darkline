@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CutLab — Video Editing Blog</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #1f1f1f;
+      --accent: #e8ff47;
+      --accent2: #ff4747;
+      --text: #e8e2d9;
+      --muted: #555;
+      --card-bg: #121212;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.35;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(1.5rem, 5vw, 5rem);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .logo span { color: var(--text); }
+
+    nav { display: flex; gap: 2rem; align-items: center; }
+    nav a {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+    nav a:hover, nav a.active { color: var(--text); }
+
+    /* ─── HERO STRIP ─── */
+    .hero {
+      padding: clamp(4rem, 10vw, 8rem) clamp(1.5rem, 5vw, 5rem) 3rem;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: 'VIDEO';
+      position: absolute;
+      right: -2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(8rem, 20vw, 18rem);
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(232,255,71,0.06);
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(232,255,71,0.3);
+      padding: 0.3rem 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 10vw, 7rem);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      max-width: 700px;
+    }
+
+    h1 em { color: var(--accent); font-style: normal; }
+
+    .hero-sub {
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 420px;
+      line-height: 1.7;
+    }
+
+    /* ─── BLOG LIST PAGE ─── */
+    #page-list { display: block; }
+    #page-article { display: none; }
+
+    .blog-grid {
+      padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 5vw, 5rem);
+    }
+
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ─── FEATURED POST ─── */
+    .featured-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+      margin-bottom: 1px;
+      cursor: pointer;
+      transition: border-color 0.3s, background 0.3s;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .featured-card:hover {
+      border-color: var(--accent);
+      background: rgba(232,255,71,0.02);
+    }
+
+    .featured-thumb {
+      aspect-ratio: 16/9;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .thumb-inner {
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+
+    .featured-card:hover .thumb-inner { transform: scale(1.06); }
+
+    .featured-info {
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .post-cat {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .post-cat.red { color: var(--accent2); }
+
+    .post-title-featured {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+      margin: 0.75rem 0;
+      color: var(--text);
+    }
+
+    .post-excerpt {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    .post-meta {
+      margin-top: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .read-cta {
+      margin-top: 1.2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .read-cta::after {
+      content: '→';
+      transition: transform 0.2s;
+    }
+
+    .featured-card:hover .read-cta::after { transform: translateX(5px); }
+
+    /* ─── POST LIST ─── */
+    .posts-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 1px;
+    }
+
+    .post-card {
+      background: var(--card-bg);
+      padding: 1.8rem 2rem;
+      cursor: pointer;
+      transition: background 0.25s;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .post-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--accent);
+      transform: scaleY(0);
+      transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+      transform-origin: bottom;
+    }
+
+    .post-card:hover { background: rgba(232,255,71,0.03); }
+    .post-card:hover::before { transform: scaleY(1); }
+
+    .post-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      color: rgba(85,85,85,0.6);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.08em;
+    }
+
+    .post-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 0.03em;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+      transition: color 0.2s;
+    }
+
+    .post-card:hover .post-title { color: var(--accent); }
+
+    .post-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 1rem;
+    }
+
+    .post-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .tag.accent { border-color: rgba(232,255,71,0.3); color: var(--accent); }
+    .tag.red { border-color: rgba(255,71,71,0.3); color: var(--accent2); }
+
+    .arrow-link {
+      font-size: 0.7rem;
+      color: var(--muted);
+      transition: color 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+
+    .post-card:hover .arrow-link { color: var(--accent); transform: translateX(4px); }
+
+    /* ─── ARTICLE PAGE ─── */
+    .article-header {
+      padding: clamp(3rem, 8vw, 6rem) clamp(1.5rem, 5vw, 5rem) 2.5rem;
+      border-bottom: 1px solid var(--border);
+      max-width: 860px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      margin-bottom: 2rem;
+      transition: color 0.2s;
+      border: none;
+      background: none;
+      padding: 0;
+    }
+
+    .back-btn:hover { color: var(--text); }
+    .back-btn::before { content: '←'; }
+
+    .article-cat {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .article-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 5.5rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+
+    .article-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .article-body {
+      padding: 3rem clamp(1.5rem, 5vw, 5rem);
+      max-width: 760px;
+    }
+
+    .article-thumb {
+      width: 100%;
+      aspect-ratio: 16/7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8rem;
+      margin-bottom: 3rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+
+    .article-body h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.03em;
+      color: var(--text);
+      margin: 2.5rem 0 1rem;
+    }
+
+    .article-body p {
+      font-size: 0.95rem;
+      line-height: 1.85;
+      color: #a8a09a;
+      margin-bottom: 1.4rem;
+    }
+
+    .article-body ul {
+      list-style: none;
+      margin: 1rem 0 1.5rem 0;
+    }
+
+    .article-body ul li {
+      font-size: 0.9rem;
+      color: #a8a09a;
+      line-height: 1.7;
+      padding-left: 1.5rem;
+      position: relative;
+      margin-bottom: 0.5rem;
+    }
+
+    .article-body ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 0.7rem;
+    }
+
+    .article-body .callout {
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.5rem;
+      background: rgba(232,255,71,0.04);
+      margin: 2rem 0;
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .article-body code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      background: rgba(255,255,255,0.05);
+      padding: 0.15em 0.4em;
+      border-radius: 2px;
+      color: var(--accent);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem clamp(1.5rem, 5vw, 5rem);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    footer p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up { animation: fadeUp 0.5s ease forwards; }
+    .delay-1 { animation-delay: 0.05s; opacity: 0; }
+    .delay-2 { animation-delay: 0.1s; opacity: 0; }
+    .delay-3 { animation-delay: 0.15s; opacity: 0; }
+    .delay-4 { animation-delay: 0.2s; opacity: 0; }
+
+    @media (max-width: 680px) {
+      .featured-card { grid-template-columns: 1fr; }
+      nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <a class="logo" onclick="showList()">Cut<span>Lab</span></a>
+  <nav>
+    <a onclick="showList()" class="active" id="nav-blog">Blog</a>
+    <a href="#">Tutorials</a>
+    <a href="#">Tools</a>
+    <a href="#">About</a>
+  </nav>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     PAGE — BLOG LIST
+════════════════════════════════════════════════ -->
+<div id="page-list">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag fade-up">✦ The Video Editor's Chronicle</div>
+    <h1 class="fade-up delay-1">MASTER <em>THE</em><br>EDIT.</h1>
+    <p class="hero-sub fade-up delay-2">
+      Deep-dives, tutorials, and creative theory for video editors —
+      from first cut to final export.
+    </p>
+  </section>
+
+  <!-- BLOG CONTENT -->
+  <div class="blog-grid">
+
+    <!-- SECTION LABEL -->
+    <div class="section-label fade-up delay-3">Featured Post</div>
+
+    <!-- FEATURED CARD -->
+    <div class="featured-card fade-up delay-4" onclick="showArticle(0)">
+      <div class="featured-thumb">
+        <div class="thumb-inner" style="background: linear-gradient(135deg,#0d0d0d,#1a1a00);">🎬</div>
+      </div>
+      <div class="featured-info">
+        <div>
+          <div class="post-cat">Fundamentals</div>
+          <div class="post-title-featured">The Grammar of Cuts: How Every Edit Tells a Story</div>
+          <p class="post-excerpt">Every cut is a decision. J-cuts, L-cuts, match cuts, jump cuts — each carries emotional weight that shapes how audiences experience time and space. This is the foundational theory every editor must internalize.</p>
+        </div>
+        <div>
+          <div class="post-meta">
+            <span>Jun 12, 2025</span>
+            <span>14 min read</span>
+            <span>by Maya Okafor</span>
+          </div>
+          <div class="read-cta">Read Article</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL POSTS GRID -->
+    <div style="margin-top: 4rem;">
+      <div class="section-label">All Articles</div>
+      <div class="posts-list" id="posts-list"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2025 CutLab — Video Editing Blog</p>
+    <p>All rights reserved · Made for editors, by editors</p>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE — ARTICLE VIEW
+════════════════════════════════════════════════ -->
+<div id="page-article">
+  <div class="article-header">
+    <button class="back-btn" onclick="showList()">Back to Blog</button>
+    <div class="article-cat" id="art-cat"></div>
+    <h1 class="article-title" id="art-title"></h1>
+    <div class="article-meta">
+      <span id="art-date"></span>
+      <span id="art-read"></span>
+      <span id="art-author"></span>
+    </div>
+  </div>
+  <div class="article-body" id="art-body"></div>
+  <footer>
+    <p>© 2025 CutLab</p>
+    <p><span style="cursor:pointer;color:var(--accent)" onclick="showList()">← Back to all posts</span></p>
+  </footer>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   DATA — ALL BLOG POSTS
+═══════════════════════════════════════════════ */
+const posts = [
+  {
+    id: 0,
+    cat: "Fundamentals",
+    catClass: "accent",
+    emoji: "🎬",
+    bg: "linear-gradient(135deg,#0d0d0d,#1a1a00)",
+    title: "The Grammar of Cuts: How Every Edit Tells a Story",
+    desc: "J-cuts, L-cuts, match cuts — each carries emotional weight that shapes how audiences experience time and space.",
+    date: "Jun 12, 2025",
+    read: "14 min read",
+    author: "Maya Okafor",
+    tag: "Theory",
+    tagClass: "accent",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#0d0d0d,#1a1a00)">🎬</div>
+      <p>Editing is the invisible art. When done well, nobody notices it — they simply feel carried through the story. When done poorly, it shatters immersion. Understanding the grammar of cuts is the foundation of everything else.</p>
+      <h2>The Four Essential Cut Types</h2>
+      <p>Before any advanced technique, you must master the basics. Every sophisticated edit is built on these four foundations.</p>
+      <ul>
+        <li><strong>The Hard Cut</strong> — Instantaneous, no transition. The workhorse of editing. Use it for tempo and impact.</li>
+        <li><strong>The J-Cut</strong> — Audio from the next scene bleeds in before the image cuts. Creates seamless flow between scenes.</li>
+        <li><strong>The L-Cut</strong> — The inverse: image cuts but previous audio continues. Builds emotional continuity.</li>
+        <li><strong>The Match Cut</strong> — Two visually rhyming frames cut together. The Kubrick bone-to-spaceship is the iconic example.</li>
+      </ul>
+      <div class="callout">💡 <strong>Pro tip:</strong> Think of J and L cuts as your default. Hard cuts should be intentional choices, not defaults — every hard cut is a micro-jolt to the audience.</div>
+      <h2>Pacing and Rhythm</h2>
+      <p>Editing is music. The <code>timing</code> between cuts creates rhythm. Short cuts accelerate time; long cuts slow it down. The best editors feel this intuitively — they cut to the energy of the scene, not just the words.</p>
+      <p>Study Walter Murch's "rule of six" — he ranks picture, story, emotion, rhythm, eye trace, and the 2D plane of the screen in that order of importance. Most editors default to picture. The masters cut to emotion first.</p>
+      <h2>Jump Cuts: Intentional vs Accidental</h2>
+      <p>A jump cut breaks continuity by cutting two similar (but not identical) angles of the same subject. Accidentally, it looks like a mistake. Intentionally — as Godard demonstrated in À bout de souffle — it's a stylistic statement, conveying fractured time or anxiety.</p>
+      <p>Know the rule before you break it. Understand exactly what energy your jump cut is injecting into the sequence.</p>
+    `
+  },
+  {
+    id: 1,
+    cat: "Color Grading",
+    catClass: "red",
+    emoji: "🎨",
+    bg: "linear-gradient(135deg,#0a0005,#1a0000)",
+    title: "Color Theory for Editors: Building a Look from Scratch",
+    desc: "How to develop a cohesive color palette using complementary hues, saturation control, and LUT customization.",
+    date: "May 28, 2025",
+    read: "11 min read",
+    author: "Devon Price",
+    tag: "Color",
+    tagClass: "red",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#0a0005,#1a0000)">🎨</div>
+      <p>Color grading is the difference between footage and cinema. It's the final emotional layer — the palette that tells the audience how to feel before a single word is spoken.</p>
+      <h2>The Three-Stage Pipeline</h2>
+      <p>Professional colorists work in three stages: correction, look development, and refinement. Skipping to "look" before you've corrected is like painting over dirt — the problems compound.</p>
+      <ul>
+        <li><strong>Correction</strong> — Fix exposure, white balance, and normalize across cameras.</li>
+        <li><strong>Look Development</strong> — Apply your creative grade: lift shadows, shape highlights, pull color vectors.</li>
+        <li><strong>Refinement</strong> — Window masks for selective grades, noise matching, final QC.</li>
+      </ul>
+      <div class="callout">🎨 The teal-and-orange grade became a cliché for a reason — complementary colors in the mid-tones and skin create immediate visual drama. Understand why it works before you reject it.</div>
+      <h2>Working With LUTs</h2>
+      <p>A LUT (Look Up Table) is a mathematical transformation of color values. Creative LUTs are starting points, not final grades. Reduce opacity to 30–60% and layer your own corrections on top. Stack <code>Technical LUT → Creative LUT → Manual grade</code> for full control.</p>
+      <h2>Matching Shots</h2>
+      <p>The most overlooked skill in color grading is shot matching — ensuring two angles of the same scene feel unified. Use scopes obsessively. Your eyes lie; waveforms don't.</p>
+    `
+  },
+  {
+    id: 2,
+    cat: "Audio Editing",
+    catClass: "accent",
+    emoji: "🎧",
+    bg: "linear-gradient(135deg,#000a0a,#001a1a)",
+    title: "Sound Design 101: Making Your Edits Hit Harder",
+    desc: "The secret weapon most video editors ignore. Learn how foley, music placement, and silence shape emotional impact.",
+    date: "May 10, 2025",
+    read: "9 min read",
+    author: "Sana Ito",
+    tag: "Audio",
+    tagClass: "accent",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#000a0a,#001a1a)">🎧</div>
+      <p>Walter Murch famously said film is 50% picture, 50% sound. Most editors treat sound as an afterthought. This is the single biggest quality gap between amateur and professional edits.</p>
+      <h2>The Layers of a Full Sound Mix</h2>
+      <ul>
+        <li><strong>Dialogue</strong> — Priority one. Clarity above everything.</li>
+        <li><strong>Foley</strong> — Footsteps, cloth, ambient texture. Builds world believability.</li>
+        <li><strong>SFX</strong> — Impact sounds, UI audio, designed elements.</li>
+        <li><strong>Ambience/Room Tone</strong> — The glue. Never leave silence between cuts — it reads as a mistake.</li>
+        <li><strong>Music</strong> — The emotional infrastructure of your edit.</li>
+      </ul>
+      <div class="callout">🔇 Silence is a sound. A beat of true silence before an impact makes the impact hit 10x harder. Use it deliberately.</div>
+      <h2>Music Placement</h2>
+      <p>Don't let music start on the first frame of a scene. Let the picture breathe, then bring music in — often 2–4 seconds in. This creates the feeling that the emotion is arising organically, not being imposed.</p>
+      <p>Similarly, trim music endings aggressively. Music that lingers too long robs the next scene of its energy. Cut music early; let the room tone carry the transition.</p>
+    `
+  },
+  {
+    id: 3,
+    cat: "Workflow",
+    catClass: "accent",
+    emoji: "⚡",
+    bg: "linear-gradient(135deg,#0a0a00,#141400)",
+    title: "Premiere Pro vs DaVinci Resolve: A Real Comparison",
+    desc: "Two industry standards, two very different philosophies. Which NLE is right for your workflow and project type?",
+    date: "Apr 22, 2025",
+    read: "13 min read",
+    author: "James Ruiz",
+    tag: "Tools",
+    tagClass: "",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#0a0a00,#141400)">⚡</div>
+      <p>The NLE wars are real, but the answer isn't tribal — it's contextual. The right tool depends on your deliverable, your team size, and the phase of post-production.</p>
+      <h2>Where Premiere Wins</h2>
+      <ul>
+        <li>Deep Adobe ecosystem integration (After Effects, Audition, Photoshop)</li>
+        <li>Better collaborative workflows via Productions</li>
+        <li>Stronger timeline feel for long-form narrative</li>
+        <li>More intuitive for new editors coming from consumer apps</li>
+      </ul>
+      <h2>Where DaVinci Wins</h2>
+      <ul>
+        <li>Best-in-class color grading tools (Color page)</li>
+        <li>Fairlight audio is a professional DAW built in</li>
+        <li>Better performance on high-res/RAW footage</li>
+        <li>Free version is genuinely professional-grade</li>
+      </ul>
+      <div class="callout">💡 The hybrid approach: edit in Premiere, round-trip to DaVinci for color and audio finish. Many professional productions use this pipeline.</div>
+      <h2>The Verdict</h2>
+      <p>For narrative/documentary with existing Adobe workflows: Premiere. For color-critical work, commercial spots, or starting fresh: DaVinci. Neither is objectively superior — both are exceptional tools used on Oscar-winning productions.</p>
+    `
+  },
+  {
+    id: 4,
+    cat: "Motion Graphics",
+    catClass: "red",
+    emoji: "✨",
+    bg: "linear-gradient(135deg,#05000a,#0a0015)",
+    title: "After Effects Expressions Every Editor Should Know",
+    desc: "You don't need to be a developer. These 10 expressions will automate your motion graphics workflow permanently.",
+    date: "Apr 5, 2025",
+    read: "10 min read",
+    author: "Maya Okafor",
+    tag: "Motion",
+    tagClass: "red",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#05000a,#0a0015)">✨</div>
+      <p>Expressions are After Effects' superpower. A single line of JavaScript can replace hours of manual keyframing. Here are the ten you'll use on every project.</p>
+      <h2>The Essential 10</h2>
+      <ul>
+        <li><code>wiggle(freq, amp)</code> — Random jitter. wiggle(2,10) for subtle camera shake.</li>
+        <li><code>loopOut("cycle")</code> — Loops any animation infinitely. Loop in and out too.</li>
+        <li><code>time * 360</code> — Endless rotation. On the Z axis for spinning logos.</li>
+        <li><code>value + wiggle(3,5)</code> — Adds wiggle on top of existing keyframed value.</li>
+        <li><code>linear(t, tMin, tMax, val1, val2)</code> — Remap time to values. The most versatile.</li>
+        <li><code>ease(t, tMin, tMax, val1, val2)</code> — Same but with easing built in.</li>
+        <li><code>thisComp.layer("Control").effect("Slider")("Slider")</code> — Pick-whip to a control layer.</li>
+        <li><code>posterizeTime(12)</code> — Reduce framerate per-layer for a choppy look.</li>
+        <li><code>Math.sin(time * freq) * amp + offset</code> — Smooth oscillation.</li>
+        <li><code>valueAtTime(time - delay)</code> — Delay any property with a single expression.</li>
+      </ul>
+      <div class="callout">⚡ Build an "Expression Control" null object at the top of every comp. Drive all expressions from sliders there — you'll thank yourself in revisions.</div>
+    `
+  },
+  {
+    id: 5,
+    cat: "Export & Delivery",
+    catClass: "accent",
+    emoji: "📦",
+    bg: "linear-gradient(135deg,#000a05,#001a0a)",
+    title: "The Complete Export Settings Guide for Every Platform",
+    desc: "YouTube, Instagram, TikTok, broadcast, cinema — the exact codec, bitrate, and settings for every destination.",
+    date: "Mar 18, 2025",
+    read: "8 min read",
+    author: "Devon Price",
+    tag: "Technical",
+    tagClass: "",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#000a05,#001a0a)">📦</div>
+      <p>Wrong export settings are invisible until they're catastrophic. Banding on YouTube. Crushed blacks on Instagram. Dropped frames on broadcast. Here's the definitive reference.</p>
+      <h2>YouTube (2025 Recommended)</h2>
+      <ul>
+        <li>Codec: <code>H.264</code> or <code>H.265</code> (HEVC for smaller files)</li>
+        <li>Bitrate: 40–60 Mbps for 4K; 8–12 Mbps for 1080p</li>
+        <li>Color: BT.709, full range</li>
+        <li>Audio: AAC 320kbps, stereo or 5.1</li>
+      </ul>
+      <h2>Instagram / TikTok</h2>
+      <ul>
+        <li>Codec: H.264, High profile</li>
+        <li>Bitrate: 3.5–5 Mbps (platforms recompress anyway)</li>
+        <li>Resolution: 1080×1920 (9:16) for Reels/TikTok</li>
+        <li>Frame rate: 30fps max — 60fps gets recompressed to 30</li>
+      </ul>
+      <h2>Cinema / DCP</h2>
+      <ul>
+        <li>Codec: JPEG2000 (via DCP tool)</li>
+        <li>Color: XYZ color space, gamma 2.6</li>
+        <li>Frame rate: 24fps exactly — not 23.976</li>
+      </ul>
+      <div class="callout">📦 Always export a master ProRes 4444 or DNxHR file before any delivery format. Storage is cheap; re-rendering from scratch is not.</div>
+    `
+  },
+  {
+    id: 6,
+    cat: "Pacing & Story",
+    catClass: "accent",
+    emoji: "🎞️",
+    bg: "linear-gradient(135deg,#0a0000,#1a0500)",
+    title: "How to Edit Documentaries: Structuring Real Stories",
+    desc: "From interview-driven narratives to observational cinema — the techniques that separate good docs from great ones.",
+    date: "Mar 2, 2025",
+    read: "16 min read",
+    author: "Sana Ito",
+    tag: "Documentary",
+    tagClass: "accent",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#0a0000,#1a0500)">🎞️</div>
+      <p>Documentary editing is fundamentally different from narrative editing. You're not executing a script — you're discovering the story in the editing room from hours of unscripted reality.</p>
+      <h2>The Paper Edit</h2>
+      <p>Before you touch the timeline, do a paper edit. Transcribe every interview. Identify every moment of gold — the surprising confession, the emotional break, the insight that reframes everything. Number and organize before you cut.</p>
+      <h2>Structuring an Interview-Driven Doc</h2>
+      <ul>
+        <li><strong>Find your spine</strong> — What is the one sentence this film is about?</li>
+        <li><strong>Build act breaks from interview moments</strong> — Let subjects' words define your acts.</li>
+        <li><strong>Use B-roll to tell, not illustrate</strong> — Show something the interview doesn't say.</li>
+        <li><strong>Silence and breath</strong> — Leave pauses. Real emotion lives in pauses.</li>
+      </ul>
+      <div class="callout">🎞️ The 3-act structure applies to docs too: establish the world, disrupt it, resolve it. The disruption is whatever makes this story worth telling now.</div>
+      <h2>Music in Documentary</h2>
+      <p>Music in documentary carries enormous ethical weight. It tells audiences how to feel about real people and real events. Use it sparingly and deliberately. Silence is often more powerful — and more honest.</p>
+    `
+  },
+  {
+    id: 7,
+    cat: "Hardware",
+    catClass: "",
+    emoji: "🖥️",
+    bg: "linear-gradient(135deg,#050508,#08080f)",
+    title: "Building the Perfect Editing Workstation in 2025",
+    desc: "CPU vs GPU rendering, RAM sweet spots, storage architecture, and display calibration — the complete hardware guide.",
+    date: "Feb 14, 2025",
+    read: "12 min read",
+    author: "James Ruiz",
+    tag: "Hardware",
+    tagClass: "",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#050508,#08080f)">🖥️</div>
+      <p>Your workstation is your instrument. The wrong setup creates friction that kills creativity. The right setup disappears entirely, leaving only the work.</p>
+      <h2>CPU: The Real Priority</h2>
+      <p>For editing timelines, CPU single-core performance matters more than core count. High core-count CPUs help with rendering, transcoding, and effects — but timeline scrubbing is single-threaded. AMD Ryzen 7/9 7000 series or Intel Core Ultra 200 series lead in 2025.</p>
+      <h2>RAM</h2>
+      <ul>
+        <li>Minimum: 32GB for 1080p/4K editing</li>
+        <li>Recommended: 64GB for heavy 4K with effects</li>
+        <li>Professional: 128GB for 6K/8K RAW or multi-stream work</li>
+      </ul>
+      <h2>Storage Architecture</h2>
+      <ul>
+        <li><strong>System drive</strong>: NVMe Gen4 SSD (OS + apps)</li>
+        <li><strong>Project drive</strong>: NVMe or SATA SSD (active projects)</li>
+        <li><strong>Archive</strong>: HDD RAID (completed projects, raw footage)</li>
+      </ul>
+      <div class="callout">🖥️ Don't skimp on your display. An uncalibrated monitor is worse than no monitor — you're grading in the dark. A calibrated 27" 4K panel with P3 coverage is the minimum for color work.</div>
+      <h2>GPU for Rendering</h2>
+      <p>DaVinci Resolve is heavily GPU-accelerated. Premiere less so, but GPU acceleration for effects matters. An RTX 4070 or RX 7800 XT is a practical sweet spot — the top-tier cards show diminishing returns in most editing workflows.</p>
+    `
+  },
+  {
+    id: 8,
+    cat: "Transitions",
+    catClass: "red",
+    emoji: "🌊",
+    bg: "linear-gradient(135deg,#00080a,#001018)",
+    title: "Transitions That Don't Suck: Moving Beyond the Cross-Dissolve",
+    desc: "Creative, motivation-driven transitions that serve the story. Plus: why most transitions are editor ego, not storytelling.",
+    date: "Jan 30, 2025",
+    read: "7 min read",
+    author: "Maya Okafor",
+    tag: "Technique",
+    tagClass: "red",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#00080a,#001018)">🌊</div>
+      <p>Here's the controversial truth: most transitions are wrong. A cross-dissolve used habitually isn't a transition — it's a confession that the editor couldn't find a clean cut.</p>
+      <h2>When Transitions Are Justified</h2>
+      <ul>
+        <li><strong>Passage of time</strong> — A dissolve is the universal signal for time passing.</li>
+        <li><strong>Dream / memory states</strong> — Soft transitions signal unreality.</li>
+        <li><strong>Motivated movement</strong> — The subject's motion carries through the transition.</li>
+        <li><strong>Style as content</strong> — Music videos, commercials, social content where form is message.</li>
+      </ul>
+      <h2>Creative Transitions Worth Using</h2>
+      <ul>
+        <li><strong>Whip pan match</strong> — Camera moves match direction between shots.</li>
+        <li><strong>Color wipe</strong> — A color field from one scene transitions to another.</li>
+        <li><strong>Subject obscures lens</strong> — Object passes in front of camera, cuts to black, new scene begins.</li>
+        <li><strong>Sound transition</strong> — The cut is on picture, but a loud sound event masks it.</li>
+      </ul>
+      <div class="callout">🌊 The best transition is a well-chosen hard cut. Everything else must earn its place with a reason rooted in story, not style.</div>
+    `
+  },
+  {
+    id: 9,
+    cat: "AI in Editing",
+    catClass: "accent",
+    emoji: "🤖",
+    bg: "linear-gradient(135deg,#000a08,#001a14)",
+    title: "AI Tools in Post-Production: What Actually Works in 2025",
+    desc: "From auto-transcription to AI color matching and generative B-roll — separating the hype from the workflows that stick.",
+    date: "Jan 12, 2025",
+    read: "11 min read",
+    author: "Devon Price",
+    tag: "AI",
+    tagClass: "accent",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#000a08,#001a14)">🤖</div>
+      <p>AI in post-production is past the hype phase. Real tools have real workflows now — and real limitations. Here's a sober assessment of what's worth integrating today.</p>
+      <h2>What's Genuinely Useful</h2>
+      <ul>
+        <li><strong>Auto-transcription (Descript, Premiere Speech to Text)</strong> — Legitimately excellent. Saves hours per project.</li>
+        <li><strong>AI background removal (DaVinci Magic Mask)</strong> — 80% of the way there. Still needs refinement passes.</li>
+        <li><strong>Noise reduction (DaVinci, Neat Video)</strong> — AI-powered NR is dramatically better than traditional NR.</li>
+        <li><strong>Music generation (Suno, Udio)</strong> — Useful for temp tracks. Not for deliverables — yet.</li>
+      </ul>
+      <h2>What's Still Overrated</h2>
+      <ul>
+        <li><strong>Auto-edit AI</strong> — No current tool can replace editorial judgment. They find cuts; they don't understand story.</li>
+        <li><strong>Generative video for B-roll</strong> — Quality and coherence aren't there for professional work yet.</li>
+        <li><strong>AI color grading</strong> — Useful starting points, not finishes.</li>
+      </ul>
+      <div class="callout">🤖 The editors who will thrive are those who use AI for the mechanical work — transcription, noise removal, organization — and double down on the craft that AI can't replicate: taste, structure, emotion.</div>
+    `
+  },
+  {
+    id: 10,
+    cat: "Narrative Editing",
+    catClass: "red",
+    emoji: "🎭",
+    bg: "linear-gradient(135deg,#0a0005,#140010)",
+    title: "Editing Performance: How to Find the Best Take",
+    desc: "Composite performances, emotional continuity, and the counterintuitive choices that produce the best scenes.",
+    date: "Dec 22, 2024",
+    read: "13 min read",
+    author: "Sana Ito",
+    tag: "Performance",
+    tagClass: "red",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#0a0005,#140010)">🎭</div>
+      <p>Editing performance is the editor's most intimate collaboration with actors. You're the last advocate for the performance — the one who chooses which truth the audience sees.</p>
+      <h2>Building a Composite Performance</h2>
+      <p>Rarely is one take the best take across an entire scene. Professional editors build composite performances — the best moment of emotion from take 3, the best line delivery from take 7, the best reaction shot from take 1.</p>
+      <h2>What to Look For</h2>
+      <ul>
+        <li><strong>Eyes first</strong> — The eyes carry the emotional truth. If the eyes are alive, build from there.</li>
+        <li><strong>Reactions over actions</strong> — In most scenes, the reaction is more important than the line. Cut to the face listening, not just speaking.</li>
+        <li><strong>Technical imperfection with emotional truth</strong> — A flubbed line with genuine emotion beats a perfect delivery that feels hollow.</li>
+        <li><strong>The moment before</strong> — What happens a beat before the scripted moment is often the most revealing.</li>
+      </ul>
+      <div class="callout">🎭 Trust the imperfect take. The slight stumble, the genuine tear, the surprised laugh — these moments of reality are what audiences connect with. Protect them.</div>
+    `
+  },
+  {
+    id: 11,
+    cat: "Freelancing",
+    catClass: "",
+    emoji: "💼",
+    bg: "linear-gradient(135deg,#080800,#141400)",
+    title: "Pricing Your Editing Work: The Complete Freelance Guide",
+    desc: "Day rates, project rates, usage fees, and revision policies — a practical framework for sustainable freelance editing.",
+    date: "Dec 5, 2024",
+    read: "9 min read",
+    author: "James Ruiz",
+    tag: "Business",
+    tagClass: "",
+    body: `
+      <div class="article-thumb" style="background: linear-gradient(135deg,#080800,#141400)">💼</div>
+      <p>The most talented editor who can't price their work sustainably won't be editing for long. Here's a framework built from real industry rates — not aspirational numbers.</p>
+      <h2>Rate Structures</h2>
+      <ul>
+        <li><strong>Day rate</strong>: Best for client-facing work. 2024 range: $350–$1,500/day depending on market and experience.</li>
+        <li><strong>Project rate</strong>: Better for independent work. Estimate hours × day rate ÷ 8, then add 20% for surprises.</li>
+        <li><strong>Retainer</strong>: Ideal for ongoing clients. Discount rate in exchange for reliability.</li>
+      </ul>
+      <h2>Revision Policy — Non-Negotiable</h2>
+      <p>Include a revision policy in every contract. Standard: 2 rounds of revisions included; additional rounds at hourly rate. Without this, revision creep will destroy your profitability.</p>
+      <div class="callout">💼 Raise your rates by 10–15% every 18 months, or when you're turning down work regularly. A full calendar at low rates is worse than a half-full calendar at high rates.</div>
+      <h2>Usage and Licensing Fees</h2>
+      <p>If your edit will be used in broadcast, cinema, or commercial advertising, usage fees apply on top of your editorial rate. Broadcast editorial projects typically carry 20–40% usage premiums. Know your worth.</p>
+    `
+  }
+];
+
+/* ═══════════════════════════════════════════════
+   RENDER POSTS LIST
+═══════════════════════════════════════════════ */
+function renderList() {
+  const container = document.getElementById('posts-list');
+  container.innerHTML = '';
+  posts.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'post-card fade-up';
+    card.style.animationDelay = `${i * 0.04}s`;
+    card.style.opacity = '0';
+    card.innerHTML = `
+      <div class="post-number">${String(i+1).padStart(2,'0')}</div>
+      <div class="post-title">${p.title}</div>
+      <p class="post-desc">${p.desc}</p>
+      <div class="post-footer">
+        <span class="tag ${p.tagClass}">${p.tag}</span>
+        <span class="arrow-link">→</span>
+      </div>
+    `;
+    card.onclick = () => showArticle(p.id);
+    container.appendChild(card);
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════ */
+function showList() {
+  document.getElementById('page-list').style.display = 'block';
+  document.getElementById('page-article').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showArticle(id) {
+  const p = posts.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('art-cat').textContent = p.cat;
+  document.getElementById('art-title').textContent = p.title;
+  document.getElementById('art-date').textContent = p.date;
+  document.getElementById('art-read').textContent = p.read;
+  document.getElementById('art-author').textContent = 'by ' + p.author;
+  document.getElementById('art-body').innerHTML = p.body;
+  document.getElementById('page-list').style.display = 'none';
+  document.getElementById('page-article').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+/* ─── INIT ─── */
+renderList();
+</script>
+</body>
+</html>
