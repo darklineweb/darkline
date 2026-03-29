@@ -1,0 +1,23 @@
+{
+  "name": "darkline",
+  "version": "1.0.0",
+  "description": "DarkLine81 - A modern, SEO-optimized viral video edits platform designed for TikTok, Facebook Reels, and YouTube Shorts growth",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/darklineweb/darkline.git"
+  },
+  "keywords": ["viral edits", "tiktok", "video editing"],
+  "author": "Dark Line 81",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/darklineweb/darkline/issues"
+  },
+  "homepage": "https://github.com/darklineweb/darkline#readme",
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0"
+  }
+}
